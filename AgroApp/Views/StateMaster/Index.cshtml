@@ -1,0 +1,416 @@
+﻿@using Kendo.Mvc.UI
+@using Entities;
+@using Common;
+@using AgroApp.Common;
+@{
+    ViewBag.Title = "State Master";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="content">
+    @Html.Partial("_Notifications")
+    <ul class="breadcrumb">
+        <li><a href="@Url.Action("Index", "Home")"><i class="icon-home2 position-left"></i> Home</a></li>
+        <li class="active">State Master</li>
+    </ul>
+    <div class="row">
+        <div class="col-lg-6 col-md-12 col-sm-12">
+
+
+
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading grid-title titlepanel gray-border">
+                        <div class="grid-title">
+                            <h5 class="panel-title">
+                                <span class="icon icon-office"></span>&nbsp;&nbsp;&nbsp;<b>State Master</b>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="">
+                            <div class="col-sm-6">
+                                <div class="pull-left mr-5">
+                                    <div class="input-group" style="margin-top: 5px;">
+                                        <input type="text" class="form-control" id='searchState' maxlength="200" placeholder="Search for State" />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        @(Html.Kendo().Grid<StateMasterModel.State>
+                                                ()
+                                                .Name("gridState")
+                                                .Columns(columns =>
+                                                {
+                                                    columns.Command(command =>
+                                                    {
+                                                        if (AuthorizationHelper.CanEdit(ViewContext.RouteData.Values["Controller"].ToString()))
+                                                        {
+                                                //command.Custom("<span class='k-icon k-i-edit'></span>").Click("stateEdit");
+                                                command.Custom("customedit").Text("<span class='k-icon k-i-edit'></span>").Click("stateEdit").HtmlAttributes(new { @title = "edit" });
+                                                        }
+                                                        if (AuthorizationHelper.CanDelete(ViewContext.RouteData.Values["Controller"].ToString()))
+                                                        {
+                                                            command.Custom("customdelete").Text("<span class='icon-trash'></span> ").Click("DeleteState").HtmlAttributes(new { @title = "Delete Category" });
+                                                        }
+
+                                                    }).Title("Action").Width(150).HtmlAttributes(WebHelper.ActionCenterColumnStyleWithCanEdit)
+                                                    .HeaderHtmlAttributes(WebHelper.ActionCenterColumnStyleWithCanEdit);
+
+                                                    columns.Bound(m => m.StateName).Title("State Name");
+
+                                                    if (AuthorizationHelper.CanChangeStatus(ViewContext.RouteData.Values["Controller"].ToString()))
+                                                    {
+                                                        columns.Bound(d => d.IsActive).Filterable(false)
+                                                        .ClientTemplate("# if (IsActive == 0) { # <span class='statusDeactive'>Deactive</span> # }"
+                                                       + "else if (IsActive == 1) { # <span class='statusActive'>Active</span> # } "
+
+                                                       + "#").Width(150);
+                                                    }
+                                                })
+                                                .ToolBar(toolbar =>
+                                                {
+                                                    if (AuthorizationHelper.CanAdd(ViewContext.RouteData.Values["Controller"].ToString()))
+                                                    {
+                                                        toolbar.Template(@<text>
+                                                            <div class="rp-button">
+                                                                <button id="btnInsert" class="btn btn-primary pull-right mr-5 mt-5" onclick="StatePopUp(0);"><span class="k-icon k-i-add"></span> Add State</button>
+                                                            </div>
+                                                        </text>);
+                                                            }
+                                                        })
+                                                       .Editable(editable =>
+                                                       {
+                                                           editable.Mode(GridEditMode.PopUp).Enabled(false);
+                                                           editable.DisplayDeleteConfirmation("Are you sure you want to delete these State?");
+                                                           editable.Window(x => x.Title("Manage State"));
+                                                       })
+                                                       .Pageable(x =>
+                                                       {
+                                                           x.Refresh(true);
+                                                           x.PageSizes(CommonHelper.PageSizes);
+                                                       })
+
+                                                       .Sortable(sortable => sortable.AllowUnsort(false))
+                                                       .Filterable()
+                                                       .NoRecords()
+                                                       .Events(grid => grid.Edit("edit"))
+                                                       .DataSource(dataSource => dataSource
+                                                       .Ajax()
+                                                       .ServerOperation(true)
+                                                       .PageSize(CommonHelper.PazeSize)
+                                                       .Model(model => model.Id(d => d.StateId))
+                                                       .Events(events => { events.Error("onError(\"gridState\")"); events.RequestEnd("reqEndState"); })
+
+                                                       .Create(update => update.Action("StateSave", "StateMaster"))
+                                                       .Read(read => read.Action("StateRead", "StateMaster").Data("onDataState"))
+                                                       .Update(update => update.Action("StateSave", "StateMaster"))
+                                                       .Destroy(destroy => destroy.Action("StateDestroy", "StateMaster"))
+                                                    ))
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-12 col-sm-12">
+
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading grid-title titlepanel gray-border">
+                        <div class="grid-title">
+                            <h5 class="panel-title">
+                                <span class="icon icon-office"></span>&nbsp;&nbsp;&nbsp;<b>District Master</b>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="">
+                            <div class="col-sm-6">
+                                <div class="pull-left mr-5">
+                                    <div class="input-group" style="margin-top: 5px;">
+                                        <input type="text" class="form-control" id='searchDist' maxlength="200" placeholder="Search for District" />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        @(Html.Kendo().Grid<StateMasterModel.District>
+                                                 ()
+                                                 .Name("gridDist")
+                                                 .Columns(columns =>
+                                                 {
+                                                     columns.Command(command =>
+                                                     {
+                                                         if (AuthorizationHelper.CanEdit(ViewContext.RouteData.Values["Controller"].ToString()))
+                                                         {
+                                                             command.Custom("customedit").Text("<span class='k-icon k-i-edit'></span>").Click("distEdit").HtmlAttributes(new { @title = "edit" });
+                                                         }
+                                                         if (AuthorizationHelper.CanDelete(ViewContext.RouteData.Values["Controller"].ToString()))
+                                                         {
+                                                             command.Custom("customdelete").Text("<span class='icon-trash'></span> ").Click("DeleteDist").HtmlAttributes(new { @title = "Delete Category" });
+                                                         }
+
+                                                     }).Title("Action").Width(150).HtmlAttributes(WebHelper.ActionCenterColumnStyleWithCanEdit)
+                                                     .HeaderHtmlAttributes(WebHelper.ActionCenterColumnStyleWithCanEdit);
+
+                                                     columns.Bound(m => m.DistName).Title("Dist Name");
+                                                     columns.Bound(m => m.StateName).Title("State Name");
+                                                     if (AuthorizationHelper.CanChangeStatus(ViewContext.RouteData.Values["Controller"].ToString()))
+                                                     {
+                                                         columns.Bound(d => d.DistIsActive).Filterable(false)
+                                                         .ClientTemplate("# if (DistIsActive == 0) { # <span class='statusDeactive'>Deactive</span> # }"
+                                                        + "else if (DistIsActive == 1) { # <span class='statusActive'>Active</span> # } "
+
+                                                        + "#").Width(150);
+                                                     }
+                                                 })
+                                                 .ToolBar(toolbar =>
+                                                 {
+                                                     if (AuthorizationHelper.CanAdd(ViewContext.RouteData.Values["Controller"].ToString()))
+                                                     {
+                                                         toolbar.Template(@<text>
+                                                            <div class="rp-button">
+                                                                <button id="btnInsert" class="btn btn-primary pull-right mr-5 mt-5" onclick="DistPopUp(0);"><span class="k-icon k-i-add"></span> Add District</button>
+                                                            </div>
+                                                        </text>);
+                                    }
+                                })
+                               .Editable(editable =>
+                               {
+                                   editable.Mode(GridEditMode.PopUp).Enabled(false);
+                                   editable.DisplayDeleteConfirmation("Are you sure you want to delete these District?");
+                                   editable.Window(x => x.Title("Manage District"));
+                               })
+                               .Pageable(x =>
+                               {
+                                   x.Refresh(true);
+                                   x.PageSizes(CommonHelper.PageSizes);
+                               })
+
+                               .Sortable(sortable => sortable.AllowUnsort(false))
+                               .Filterable()
+                               .NoRecords()
+                               .Events(grid => grid.Edit("edit"))
+                               .DataSource(dataSource => dataSource
+                               .Ajax()
+                               .ServerOperation(true)
+                               .PageSize(CommonHelper.PazeSize)
+                               .Model(model => model.Id(d => d.DistId))
+                               .Events(events => { events.Error("onError(\"gridDist\")"); events.RequestEnd("reqEndDist"); })
+                               .Create(update => update.Action("DistSave", "StateMaster"))
+                               .Read(read => read.Action("DistRead", "StateMaster").Data("onDataDist"))
+                               .Update(update => update.Action("DistSave", "StateMaster"))
+                               .Destroy(destroy => destroy.Action("DistDestroy", "StateMaster"))
+))
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </div>
+
+
+    @(Html.Kendo().Window()
+                        .Name("State")
+                        .Visible(false)
+                        .Draggable(true)
+                        .Modal(true)
+                        .Width(670)
+                        .Height(140)
+                        .Scrollable(false))
+    @(Html.Kendo().Window()
+                        .Name("Dist")
+                        .Visible(false)
+                        .Draggable(true)
+                        .Modal(true)
+                        .Width(670)
+                        .Height(180)
+                        .Scrollable(false))
+
+    <script type="text/javascript">
+
+
+        function edit(e) {
+            if (e.model.isNew()) {
+                e.model.set("IsActive", true);
+            }
+            e.container.data('kendoWindow').bind('activate', function () {
+                setFocusById('Name');
+            });
+        }
+
+        function reqEndState(para) {
+            if (para.type == 'update' || para.type == 'create' || para.type == 'destroy') {
+                $('#gridState').data('kendoGrid').dataSource.read();
+            }
+
+            window.DisplayResponseMessage(para);
+        }
+
+        function reqEndDist(para) {
+            if (para.type == 'update' || para.type == 'create' || para.type == 'destroy') {
+                $('#gridDist').data('kendoGrid').dataSource.read();
+            }
+
+            window.DisplayResponseMessage(para);
+        }
+
+        function stateEdit(e) {
+            debugger
+            if (e != 0) {
+
+                e.preventDefault();
+                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                var stateId = dataItem.StateId;
+            }
+            StatePopUp(stateId);
+        }
+
+        function StatePopUp(stateId) {
+            debugger
+
+            var urllink = '@Url.Action("StateWindowOpen", "StateMaster")?stateId=' + stateId;
+        var window = $("#State").data("kendoWindow");
+            window.content("<H5>Please wait..<H5>");
+        window.title("Add State");
+        window.refresh({
+            url: urllink
+        });
+        window.center();
+        window.open();
+        }
+
+
+         function distEdit(e) {
+            debugger
+            if (e != 0) {
+
+                e.preventDefault();
+                var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+                var distId = dataItem.DistId;
+            }
+             DistPopUp(distId);
+        }
+
+        function DistPopUp(distId) {
+            debugger
+
+            var urllink = '@Url.Action("DistWindowOpen", "StateMaster")?distId=' + distId;
+        var window = $("#Dist").data("kendoWindow");
+            window.content("<H5>Please wait..<H5>");
+        window.title("Add District");
+        window.refresh({
+            url: urllink
+        });
+        window.center();
+        window.open();
+        }
+
+
+        $('#searchState').bind('input', function () {
+
+            debugger
+            var str = $("#searchState").val();
+
+           // onDataState();
+            $("#gridState").data("kendoGrid").dataSource.read({
+                str: $.trim($('#searchState').val()),
+            });
+        });
+
+        function onDataState() {
+            return {
+                str: $('#searchState').val()
+            }
+        }
+
+        $('#searchDist').bind('input', function () {
+
+            debugger
+            var str = $("#searchDist").val();
+
+            // onDataState();
+            $("#gridDist").data("kendoGrid").dataSource.read({
+                strDist: $.trim($('#searchDist').val()),
+            });
+        });
+
+        function onDataDist() {
+            return {
+                strDist: $('#searchDist').val()
+            }
+        }
+
+
+        function DeleteState(e) {
+            debugger
+            var stateid = 0;
+        if (e != 0) {
+             stateid = this.dataItem($(e.target).closest("tr")).StateId;
+        }
+        bootbox.confirm("Are You Sure You Want To Delete Category?", function (result) {
+            if (result) {
+
+               $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("StateDestroy", "StateMaster")',
+                    dataType: 'json',
+                   data: { stateId: stateid },
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        if (data) {
+                            ShowSuccessMessage("State Deleted SucessFully!!!");
+                           
+                            $('#gridState').data('kendoGrid').dataSource.read();
+                            $('#gridDist').data('kendoGrid').dataSource.read();
+                        }
+                    },
+                    error: function () {
+                        alert("We are facing some problem please try again later");
+                        $('#gridState').data('kendoGrid').dataSource.read();
+                    }
+                });
+            }
+
+        });
+        }
+        function DeleteDist(e) {
+            debugger
+            var distid = 0;
+        if (e != 0) {
+            distid = this.dataItem($(e.target).closest("tr")).DistId;
+        }
+        bootbox.confirm("Are You Sure You Want To Delete Category?", function (result) {
+            if (result) {
+
+               $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("DistDestroy", "StateMaster")',
+                    dataType: 'json',
+                   data: { distId: distid },
+                    cache: false,
+                    async: false,
+                    success: function (data) {
+                        if (data) {
+                            ShowSuccessMessage("District Deleted SucessFully!!!");
+                           
+                            $('#gridDist').data('kendoGrid').dataSource.read();
+                        }
+                    },
+                    error: function () {
+                        alert("We are facing some problem please try again later");
+                        $('#gridDist').data('kendoGrid').dataSource.read();
+                    }
+                });
+            }
+
+        });
+    }
+    </script>
+
+
+

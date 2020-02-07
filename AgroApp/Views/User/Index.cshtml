@@ -1,0 +1,178 @@
+﻿@using Kendo.Mvc.UI
+@using Entities;
+@using Common;
+@using AgroApp.Common;
+@{
+    ViewBag.Title = "User Manager";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content">
+    @Html.Partial("_Notifications")
+    <ul class="breadcrumb">
+        <li><a href="@Url.Action("Index", "Home")"><i class="icon-home2 position-left"></i> Home</a></li>
+        <li class="active">User Manager</li>
+    </ul>
+
+    <div class="panel panel-default">
+        <div class="panel-heading grid-title titlepanel gray-border">
+            <div class="grid-title">
+                <h5 class="panel-title">
+                    <b>User Manager</b>
+                </h5>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="">
+                <div class="col-sm-6">
+                    <div class="pull-left mr-5">
+                        <div class="input-group" style="margin-top: 5px;">
+                            <input type="text" class="form-control" id='searchUser' maxlength="200" placeholder="Search for User" />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            @(Html.Kendo().Grid<UserModel>
+                                        ()
+                                        .Name("gridUser")
+                                        .Columns(columns =>
+                                        {
+                                            columns.Command(command =>
+                                            {
+                                                if (AuthorizationHelper.CanEdit(ViewContext.RouteData.Values["Controller"].ToString()))
+                                                {
+                                                    command.Custom("customedit").Text("<span class='k-icon k-i-edit'></span>").Click("AddUser").HtmlAttributes(new { @title = "edit" });
+                                                }
+                                                if (AuthorizationHelper.CanDelete(ViewContext.RouteData.Values["Controller"].ToString()))
+                                                {
+                                                    command.Destroy().Text(" ");
+                                                }
+
+                                            }).Title("Action").Width(150).HtmlAttributes(WebHelper.ActionCenterColumnStyleWithCanEdit)
+                                            .HeaderHtmlAttributes(WebHelper.ActionCenterColumnStyleWithCanEdit);
+
+                                            columns.Bound(m => m.UserName).Title("User Name");
+                                            columns.Bound(m => m.Password).Title("Password");
+                                            columns.Bound(m => m.Name).Title("User Full Name");
+                                            columns.Bound(m => m.RoleName).Title("Role Name");
+                                            columns.Bound(m => m.EmailAddress).Title("Email");
+
+                                            if (AuthorizationHelper.CanChangeStatus(ViewContext.RouteData.Values["Controller"].ToString()))
+                                            {
+                                                columns.Bound(d => d.IsActive).Filterable(false)
+                                                .ClientTemplate("# if (IsActive == 0) { # <span class='statusDeactive'>Deactive</span> # }"
+                                               + "else if (IsActive == 1) { # <span class='statusActive'>Active</span> # } "
+
+                                               + "#").Width(150);
+                                            }
+                                        })
+                                        .ToolBar(toolbar =>
+                                        {
+                                            if (AuthorizationHelper.CanAdd(ViewContext.RouteData.Values["Controller"].ToString()))
+                                            {
+                                                toolbar.Template(@<text>
+                                                    <div class="rp-button">
+                                                        <button id="btnInsert" class="btn btn-primary pull-right mr-5 mt-5" onclick="AddUser(0);"><span class="k-icon k-i-add"></span> Add User</button>
+                                                    </div>
+                                                </text>);
+                                            }
+                                        })
+                                        .Editable(editable =>
+                                        {
+                                            editable.Mode(GridEditMode.PopUp);
+                                            editable.DisplayDeleteConfirmation("Are you sure you want to delete these User?");
+                                            editable.Window(x => x.Title("Manage User"));
+                                        })
+                                        .Pageable(x =>
+                                        {
+                                            x.Refresh(true);
+                                            x.PageSizes(CommonHelper.PageSizes);
+                                        })
+
+                                        .Sortable(sortable => sortable.AllowUnsort(false))
+                                        .Filterable()
+                                        .NoRecords()
+                                        .Events(grid => grid.Edit("edit"))
+                                        .DataSource(dataSource => dataSource
+                                        .Ajax()
+                                        .ServerOperation(true)
+                                        .PageSize(CommonHelper.PazeSize)
+                                        .Model(model => model.Id(d => d.UserId))
+                                        .Events(events => { events.Error("onError(\"gridUser\")"); events.RequestEnd("reqEnd"); })
+                                        //.Events(d => d.RequestEnd("RoleRuleRequestEnd"))
+                                        .Create(update => update.Action("KendoSave", "User"))
+                                        .Read(read => read.Action("KendoRead", "User").Data("onData"))
+                                        .Update(update => update.Action("KendoSave", "User"))
+                                        .Destroy(update => update.Action("KendoDestroy", "User"))
+                                ))
+        </div>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+   
+
+    function edit(e) {
+        if (e.model.isNew()) {
+            e.model.set("IsActive", true);
+        }
+        e.container.data('kendoWindow').bind('activate', function () {
+            setFocusById('Name');
+        });
+    }
+
+   
+    function additionalInfo() {
+        return {
+            roleId: getLocalValue('RoleId')
+        };
+    }
+
+    function reqEnd(para) {
+        if (para.type == 'update' || para.type == 'create' || para.type == 'destroy') {
+            $('#gridUser').data('kendoGrid').dataSource.read();
+        }
+
+        window.DisplayResponseMessage(para);
+    }
+
+    function AddUser(e) {
+        debugger
+        if (e != 0) {
+
+            e.preventDefault();
+            var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+            var userId = dataItem.UserId;
+            window.location.href = "@Url.Action("UserAddEdit","User")?userId=" + userId;
+        }
+        else {
+            window.location.href = "@Url.Action("UserAddEdit", "User")?userId=" + 0;
+        }
+    }
+
+
+    $('#searchUser').bind('input', function () {
+
+        debugger
+        var str = $("#searchUser").val();
+
+        // onDataState();
+        $("#gridUser").data("kendoGrid").dataSource.read({
+            str: $.trim($('#searchUser').val()),
+        });
+    });
+
+    function onData() {
+        return {
+            str: $('#searchUser').val()
+        }
+    }
+
+</script>
+
+

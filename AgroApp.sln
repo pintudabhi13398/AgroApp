@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgroApp", "AgroApp\AgroApp.csproj", "{9302906F-DD46-4DE7-AEF7-1DB1851FC80A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "Entities\Entities.csproj", "{290198EB-5D73-4A41-99FC-3750C513636C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9302906F-DD46-4DE7-AEF7-1DB1851FC80A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9302906F-DD46-4DE7-AEF7-1DB1851FC80A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9302906F-DD46-4DE7-AEF7-1DB1851FC80A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9302906F-DD46-4DE7-AEF7-1DB1851FC80A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{290198EB-5D73-4A41-99FC-3750C513636C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{290198EB-5D73-4A41-99FC-3750C513636C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{290198EB-5D73-4A41-99FC-3750C513636C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{290198EB-5D73-4A41-99FC-3750C513636C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B4342DA8-837D-4B5A-A209-6F5F9645A20B}
+	EndGlobalSection
+EndGlobal

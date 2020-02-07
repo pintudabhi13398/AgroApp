@@ -1,0 +1,164 @@
+﻿@using Kendo.Mvc.UI
+@using Entities;
+@using Common;
+@using AgroApp.Common;
+@{
+    ViewBag.Title = "Roles";
+}
+
+
+<div class="content">
+    @Html.Partial("_Notifications")
+<ul class="breadcrumb">
+    <li><a href="@Url.Action("Index", "Home")"><i class="icon-home2 position-left"></i> Home</a></li>
+    <li class="active">Role Rights</li>
+</ul>
+
+<div class="panel panel-default">
+    <div class="panel-heading grid-title titlepanel gray-border">
+        <div class="grid-title">
+            <h5 class="panel-title">
+                <b>Dashboard</b>
+            </h5>
+        </div>
+    </div>
+    <div class="panel-body">
+
+
+        @(Html.Kendo().Grid<RoleReadModel>
+                                ()
+                                .Name("gridRole")
+                                .Columns(columns =>
+                                {
+                                    columns.Command(command =>
+                                    {
+                                        if (AuthorizationHelper.CanEdit(ViewContext.RouteData.Values["Controller"].ToString()))
+                                        {
+                                            command.Edit().Text(" ");
+                                        }
+                                        if (AuthorizationHelper.CanDelete(ViewContext.RouteData.Values["Controller"].ToString()))
+                                        {
+                                            command.Destroy().Text(" ");
+                                        }
+                                        if (AuthorizationHelper.CanEdit(ViewContext.RouteData.Values["Controller"].ToString()))
+                                        {
+                                            command.Custom("Assign Rights").Click("assignRights").HtmlAttributes(new { @title = "Assign Rights" });
+                                        }
+                                    }).Title("Action").Width(150).HtmlAttributes(WebHelper.ActionCenterColumnStyleWithCanEdit)
+                                    .HeaderHtmlAttributes(WebHelper.ActionCenterColumnStyleWithCanEdit);
+
+                                    columns.Bound(m => m.RoleName).Title("Role Name").Width(900);
+                                    if (AuthorizationHelper.CanChangeStatus(ViewContext.RouteData.Values["Controller"].ToString()))
+                                    {
+                                        columns.Bound(d => d.IsActive).Filterable(false)
+                                        .ClientTemplate("# if (IsActive == 0) { # <span class='statusDeactive'>Deactive</span> # }"
+                                       + "else if (IsActive == 1) { # <span class='statusActive'>Active</span> # } "
+
+                                       + "#").Width(150);
+                                    }
+                                })
+                                .ToolBar(toolbar =>
+                                {
+                                    if (AuthorizationHelper.CanAdd(ViewContext.RouteData.Values["Controller"].ToString()))
+                                    {
+                                        toolbar.Create().Text("Add");
+                                    }
+                                })
+                                .Editable(editable =>
+                                {
+                                    editable.Mode(GridEditMode.PopUp);
+                                    editable.DisplayDeleteConfirmation("Are you sure you want to delete these Role?");
+                                    editable.Window(x => x.Title("Manage Role"));
+                                })
+                                .Pageable(x =>
+                                {
+                                    x.Refresh(true);
+                                    x.PageSizes(CommonHelper.PageSizes);
+                                })
+
+                                .Sortable(sortable => sortable.AllowUnsort(false))
+                                .Filterable()
+                                .NoRecords()
+                                .Events(grid =>  grid.Edit("edit"))
+                                .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .ServerOperation(true)
+                                .PageSize(CommonHelper.PazeSize)
+                                .Model(model => model.Id(d => d.RoleId))
+                                .Events(events => { events.Error("onError(\"gridRole\")"); events.RequestEnd("reqEnd"); })
+                                //.Events(d => d.RequestEnd("RoleRuleRequestEnd"))
+                                .Create(update => update.Action("KendoSave", "Role"))
+                                .Read(read => read.Action("KendoRead", "Role"))
+                                .Update(update => update.Action("KendoSave", "Role"))
+                                .Destroy(update => update.Action("KendoDestroy", "Role"))
+                        ))
+    </div>
+</div>
+</div>
+
+
+@(Html.Kendo().Window()
+                .Name("myWindow")
+                .Visible(false)
+                .Draggable(true)
+                .Modal(true)
+                .Width(630)
+                .Height(450)
+                .Events(events => events.Activate("onActivate")))
+
+<script type="text/javascript">
+
+
+    function edit(e) {
+        if (e.model.isNew()) {
+            e.model.set("IsActive", true);
+        }
+        e.container.data('kendoWindow').bind('activate', function () {
+            setFocusById('RoleName');
+        });
+    }
+
+    function assignRights(e) {
+        debugger
+        e.preventDefault();
+        var tr = $(e.target).closest("tr");
+        var data = this.dataItem(tr);
+        var urllink = '@Url.Action("RoleMenusView", "Role")';
+
+        setLocalValue('RoleId', data.RoleId);
+
+        var window = $("#myWindow").data("kendoWindow");
+        window.content("");
+        window.title("Assign Access Rights");
+        window.refresh({
+            url: urllink
+
+        });
+
+        window.center();
+        window.open();
+    }
+
+    function additionalInfo() {
+        return {
+            roleId: getLocalValue('RoleId')
+        };
+    }
+
+    function onActivate() {
+        CheckAllView();
+        CheckAllEdit();
+        CheckAllAdd();
+        CheckAllDelete();
+        CheckAllStatusChange();
+    }
+
+    function reqEnd(para) {
+        if (para.type == 'update' || para.type == 'create' || para.type == 'destroy') {
+            $('#gridRole').data('kendoGrid').dataSource.read();
+        }
+
+        window.DisplayResponseMessage(para);
+    }
+
+</script>

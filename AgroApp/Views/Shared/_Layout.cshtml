@@ -1,0 +1,131 @@
+﻿@using Common
+@using Kendo.Mvc.UI
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" href="~/favicon.ico">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro App</title>
+
+    <!-- Global stylesheets -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+
+    <link href="~/Content/css/icons/icomoon/styles.css" rel="stylesheet" />
+    <link href="~/Content/css/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/css/core.css" rel="stylesheet" />
+    <link href="~/Content/css/components.css" rel="stylesheet" />
+    <link href="~/Content/css/colors.css" rel="stylesheet" />
+    <link href="~/Content/css/pnotify.custom.min.css" rel="stylesheet" />
+    <link href="~/Content/kendo-ui/styles/kendo.common.min.css" rel="stylesheet" />
+    <link href="~/Content/kendo-ui/styles/kendo.silver.min.css" rel="stylesheet" />
+    <link href="~/Content/kendo-ui/styles/kendoCustom.css" rel="stylesheet" />
+    <link href="~/Content/kendo-ui/styles/kendo.custom.css" rel="stylesheet" />
+
+    <!-- /global stylesheets -->
+    <!-- Core JS files -->
+    <script src="~/Content/js/loaders/pace.min.js"></script>
+    <script src="~/Content/js/core/jquery.min.js"></script>
+    <script src="~/Content/js/core/bootstrap.min.js"></script>
+    <script src="~/Content/js/loaders/blockui.min.js"></script>
+
+    <script src="~/Scripts/bootbox.js"></script>
+    <script src="~/Content/kendo-ui/js/kendo.all.min.js"></script>
+    <script src="~/Content/kendo-ui/js/kendo.aspnetmvc.min.js"></script>
+    <script src="~/Content/kendo-ui/js/cultures/kendo.culture.en-IN.min.js"></script>
+    <script src="~/Scripts/Common.js"></script>
+    @*<script src="~/Content/kendo-ui/js/cultures/kendo.culture.en-US.min.js"></script>*@
+
+    <!-- /core JS files -->
+
+
+</head>
+<body>
+    <style>
+        .statusDeactive {
+            background: #f00;
+            color: #fff;
+            padding: 1px 5px 3px;
+            border-radius: 3px;
+        }
+
+        .statusActive {
+            background: #3cab07;
+            color: #fff;
+            padding: 1px 5px 3px;
+            border-radius: 3px;
+        }
+    </style>
+    @Html.Partial("_Header")
+
+    <div class="page-container">
+        <!-- Page content -->
+        <div class="page-content">
+
+            @Html.Partial("_Sidebar")
+
+            <div class="content-wrapper">
+                <div class="content">
+                    @RenderBody()
+
+                    <div class="footer text-muted">
+                        &copy; @System.DateTime.Now.Year. <a href="#">Agro App</a>
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+        @*<div class="loader">
+          <img src="~/Content/images/loager.gif" alt="Loading..." />
+        </div>*@
+    </div>
+
+    <!-- Theme JS files -->
+    <script src="~/Content/js/core/app.js"></script>
+    <script src="~/Content/js/pnotify.custom.min.js"></script>
+
+    @*<script src="~/Content/kendo-ui/js/jszip.min.js"></script>*@
+    <!-- /theme JS files -->
+</body>
+
+</html>
+
+@(Html.Kendo().Window()
+            .Name("ChangePassword")
+            .Title("Change Password")
+            .Visible(false)
+            .Draggable(true)
+            .Height(200)
+            .Modal(true))
+
+<script type="text/javascript">
+    var pathArray = '@WebHelper.SiteRootPathUrl' + '/';
+
+    var controllerName = '@ViewContext.RouteData.Values["Controller"].ToString()';
+
+    $(document).ready(function () {
+        $('.loader').remove();
+        kendo.culture('en-IN');
+        setActiveMenulink();
+        
+    });
+
+    function OpenChangePasswordWindow() {
+        var urllink = '@Url.Action("OpenChangePasswordWindow", "Home")';
+        var window = $("#ChangePassword").data("kendoWindow");
+        window.refresh({
+            url: urllink
+        });
+        window.center();
+        window.open();
+    }
+
+   
+
+</script>
+
+
+
+

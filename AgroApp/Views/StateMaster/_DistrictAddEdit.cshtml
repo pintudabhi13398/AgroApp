@@ -1,0 +1,108 @@
+﻿
+@using Kendo.Mvc.UI
+
+@using Common;
+@model Entities.StateMasterModel.District
+
+@{
+    Layout = null;
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "DistForm" }))
+{
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(m => m.DistId)
+    <div class="k-edit-form-container">
+
+        <div class="row">
+            @Html.LabelFor(model => model.DistName, htmlAttributes: new { @class = "editor-label" })
+            <div class="editor-field">
+                @(Html.Kendo().TextBoxFor(m => m.DistName))
+                @Html.ValidationMessageFor(model => model.DistName, "", new { @class = "text-danger" })
+
+            </div>
+
+            @Html.LabelFor(model => model.StateName, htmlAttributes: new { @class = "editor-label" })
+            <div class="editor-field">
+                @*@(Html.Kendo().TextBoxFor(m => m.StateName))*@
+                @*@(Html.Kendo().ComboBoxFor(m => m.StateId).HtmlAttributes(new { @style = "width: 100%" })
+        .DataTextField("Name")
+           .DataValueField("Id")
+           .DataSource(source =>
+           {
+               source.Read(read =>
+               {
+                   read.Action("GetStateList", "Common");
+               });
+           })
+         .Placeholder("-- Select --"))*@
+                @(Html.Kendo().DropDownListFor(m => m.StateId)
+                    .OptionLabel("Select Satate")
+                    .HtmlAttributes(new { id = "CountryId", style = "width:100%;" })
+                    .DataTextField("Name")
+                    .DataValueField("Id")
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetStateList", "Common");
+                        });
+                    })
+                    //Events(e => e.Change("onCountryChange").DataBound("onCountryBound"))
+                    )
+                
+               
+                @Html.ValidationMessageFor(model => model.StateName, "", new { @class = "text-danger" })
+
+            </div>
+            @Html.LabelFor(model => model.DistIsActive, htmlAttributes: new { @class = "editor-label" })
+            <div class="editor-field">
+                @(Html.Kendo().CheckBoxFor(m => m.DistIsActive))
+                @Html.ValidationMessageFor(model => model.DistIsActive, "", new { @class = "text-danger" })
+            </div>
+            <div class="k-edit-buttons">
+
+                <input type="button" value="SAVE" class="k-button k-button-icontext k-primary" onclick="DistSave();" />
+                <input type="button" value="CANCEL" class="k-button k-button-icontext" onclick="ClosePopup();" />
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+
+       function DistSave() {
+            debugger
+           var validator = $('#DistForm').kendoValidator().data("kendoValidator");
+        if (validator.validate()) {
+            var url = '@Url.Action("DistSave", "StateMaster")';
+            var paramValue = $('#DistForm').serialize();
+            callwebservice(url, paramValue, saveCompleted, false, datatypeEnum.json, typeEnum.post);
+            return true;
+        }
+        return false;
+    }
+    function ClosePopup() {
+        closeKendoWindow("Dist");
+    }
+    function saveCompleted(returString) {
+        
+        debugger
+        if (returString.id ==1) {
+            ClosePopup();
+            $('#gridDist').data('kendoGrid').dataSource.read();
+            ShowSuccessMessage("District Saved SucessFully!!!");
+        }
+        else if (returString.id == 2) {
+            ClosePopup();
+            $('#gridDist').data('kendoGrid').dataSource.read();
+            ShowSuccessMessage("District Updated SucessFully!!!");
+
+        }
+        else {
+            ClosePopup();
+            ShowErrorMessage("District Already Exist !!!");
+        }
+
+    }
+</script>

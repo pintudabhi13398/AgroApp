@@ -1,0 +1,247 @@
+﻿@using Kendo.Mvc.UI
+
+@model Entities.UserModel
+@{
+    ViewBag.Title = "UserAddEdit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content">
+    @using (Html.BeginForm("UserSave", "User", FormMethod.Post, new { @id = "formUser" }))
+    {
+        <div class="panel panel-flat">
+            <div class="panel-body">
+
+                @Html.Partial("_Notifications")
+
+                @Html.HiddenFor(m => m.UserId)
+                <fieldset>
+                    <legend class="text-bold">
+                        <i class="icon-info22 position-left"></i>@if (Model.UserId > 0)
+                        {<text>Edit User</text>}
+                    else
+                    {<text> Add User </text>}
+                    </legend>
+                    <div class="form-horizontal">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>User Name :</label>
+                                    <div class="clearfix"></div>
+                                    @Html.TextBoxFor(m => m.UserName, new { @class = "k-textbox" })
+                                    @Html.ValidationMessageFor(m => m.UserName)
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Full Name:</label><div class="clearfix"></div>
+                                    @Html.TextBoxFor(m => m.Name, new { @class = "k-textbox" })
+                                    @Html.ValidationMessageFor(m => m.Name)
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Role:</label><div class="clearfix"></div>
+                                    @(Html.Kendo().DropDownListFor(d => d.RoleId)
+                                                                                        .OptionLabel("Select Role")
+                                                                                          .HtmlAttributes(new { id = "RoleId" })
+                                                                                        .DataTextField("Name")
+                                                                                        .DataValueField("Id")
+                                                                                        .DataSource(source =>
+                                                                                        {
+                                                                                            source.Read(read =>
+                                                                                            {
+                                                                                                read.Action("GetAllRole", "Common");
+                                                                                            });
+                                                                                        })
+                                    )
+                                    @Html.ValidationMessageFor(d => d.RoleId)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Email :</label><div class="clearfix"></div>
+                                    @Html.TextBoxFor(m => m.EmailAddress, new { @class = "k-textbox" })
+                                    @Html.ValidationMessageFor(m => m.EmailAddress)
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Phone :</label><div class="clearfix"></div>
+                                    @Html.TextBoxFor(m => m.Phone, new { @class = "k-textbox", maxlength = "20" })
+                                    @Html.ValidationMessageFor(m => m.Phone)
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Address</label><div class="clearfix"></div>
+                                    @Html.TextAreaFor(m => m.Address, new { @class = "k-textbox" })
+
+                                    @Html.ValidationMessageFor(m => m.Address)
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>ZipCode</label><div class="clearfix"></div>
+                                    @Html.TextBoxFor(m => m.ZipCode, new { @class = "k-textbox" })
+
+                                    @Html.ValidationMessageFor(m => m.ZipCode)
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>State:</label><div class="clearfix"></div>
+                                    @(Html.Kendo().DropDownListFor(d => d.StateId)
+                                                                                        .OptionLabel("Select Country")
+                                                                                          .HtmlAttributes(new { id = "StateId" })
+                                                                                        .DataTextField("Name")
+                                                                                        .DataValueField("Id")
+                                                                                        .DataSource(source =>
+                                                                                        {
+                                                                                            source.Read(read =>
+                                                                                            {
+                                                                                                read.Action("GetAllState", "Common");
+                                                                                            });
+                                                                                        })
+                                    )
+                                    @Html.ValidationMessageFor(d => d.StateId)
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>District:</label><div class="clearfix"></div>
+                                    @(Html.Kendo().DropDownListFor(d => d.DistId)
+                                                                                        .HtmlAttributes(new { id = "DistId" })
+                                                                                          .DataTextField("Name")
+                                                                                            .OptionLabel("Select State")
+                                                                                          .DataValueField("Id")
+                                                                                          .DataSource(source =>
+                                                                                          {
+                                                                                              source.Read(read =>
+                                                                                              {
+                                                                                                  read.Action("GetAllDist", "Common").Data("filterDist");
+                                                                                              }).ServerFiltering(true);
+                                                                                          }).Enable(false)
+                                                                                         .AutoBind(false)
+                                                                                         .CascadeFrom("StateId")
+                                    )
+                                    @Html.ValidationMessageFor(d => d.DistId)
+                                </div>
+                                <script>
+                                    function filterDist() {
+                                        return {
+                                            stateId: $("#StateId").val()
+                                        };
+                                    }
+                                </script>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Password:</label><div class="clearfix"></div>
+                                    @Html.TextBoxFor(m => m.Password, new { @class = "k-textbox" })
+
+                                    @Html.ValidationMessageFor(m => m.Password)
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Confirm Password:</label><div class="clearfix"></div>
+                                    @Html.TextBoxFor(m => m.ConfirmPassword, new { @class = "k-textbox" })
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label></label><div class="clearfix"></div>
+                                    @Html.Kendo().CheckBoxFor(m => m.IsActive)
+                                    @*<input type="checkbox" name="IsActive" id="IsActive" class="k-checkbox" value="@Model.IsActive" @(Model.IsActive ? "checked=\"checked\"" : "") />*@
+                                     <label><b>Is Active</b></label>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>User Photo:</label><div class="clearfix"></div>
+                                @(Html.Kendo().Upload()
+                                                                           .Name("file")
+                                                                            .Validation(validation => validation.AllowedExtensions(new string[] { ".jpg", ".png", ".jpeg" }).MaxFileSize(3145728))
+
+                                )
+                                @*@if (Model.UserId > 0 && Model.Image != null)
+                                {
+                                    <img width="200px" height="150px" src="@Url.Content("~/Image/" + Model.Image)" class="img" />
+                                    @Html.HiddenFor(model => model.Image);
+                                }*@
+                                @Html.ValidationMessageFor(model => model.Image)
+                                <div>Maximum allowed file size is  <strong>3MB</strong> </div>
+                                <div>Allowed Extensions for file size is   <strong> .jpeg, .jpg, .png</strong> </div>
+
+                            </div>
+                        </div>
+                        @if (Model.UserId > 0 && Model.Image != null)
+                        {
+                            <div class="col-md-4">
+                                <div class="form-group">
+
+
+                                    <img width="200px" height="150px" src="@Url.Content("~/Image/UserProfile/" + Model.Image)" class="img" />
+                                    @Html.HiddenFor(model => model.Image)
+                                   
+
+                                </div>
+                            </div>
+                        }
+                        </div>
+                </fieldset>
+                <div class="right pull-right">
+                 
+                        <input type="button" class="btn bg-primary  mt-20" id="btnBack" value="Back" onclick="btnback();">
+                   
+                        <input type="submit" class="btn bg-primary  mt-20" id="btnSave" value="Save" onclick="return Savedata();">
+                       
+                    </div>
+
+                </div>
+        </div>
+    }
+</div>
+
+
+    <script>
+     
+        function Savedata()
+        {
+            var validator = $("#formUser").kendoValidator().data("kendoValidator");
+            
+               
+                var pass = $("#Password").val();
+                var Conpass = $("#ConfirmPassword").val();
+                if (pass != Conpass) {
+                    $('#ConfirmPassword').after('<span class="k-widget k-tooltip k-tooltip-validation k-invalid-msg field-validation-error"  data-for="ReAssignToId" data-valmsg-for="ReAssignToId" id="Reassign_old" role="alert"><span class="k-icon k-warning"></span> Password should not be match</span>');
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            
+        }
+        function btnback() {
+            window.location.href = "@Url.Action("Index","User")"
+        }
+
+       
+</script>

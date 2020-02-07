@@ -1,0 +1,21 @@
+﻿@{
+   ViewBag.Title = "Home Page";
+}
+<div class="content">
+    @Html.Partial("_Notifications")
+    <ul class="breadcrumb">
+        <li><a href="@Url.Action("Index", "Home")"><i class="icon-home2 position-left"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+    </ul>
+    <div class="panel panel-default">
+        <div class="panel-heading grid-title titlepanel gray-border">
+            <div class="grid-title">
+                <h5 class="panel-title">
+                    <b>Dashboard</b>
+                </h5>
+            </div>
+        </div>
+        <div class="panel-body">
+        </div>
+    </div>
+</div>
