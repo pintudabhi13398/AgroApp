@@ -29,5 +29,6 @@ namespace AgroApp
             info.DateTimeFormat.ShortDatePattern = "dd-MM-yyyy";
             System.Threading.Thread.CurrentThread.CurrentCulture = info;
         }
+        //comment
     }
 }
