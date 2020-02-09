@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Entities
 {
+    // Login module
     public class LoginModel
     {
         [Display(Name = "Username")]
