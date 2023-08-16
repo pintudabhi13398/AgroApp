@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
+///Comment here
 namespace Entities
 {
     public class AssignRoles_Result
